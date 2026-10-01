@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Anggota Baru UKM NADIR</title>
+    <style>
+        /* BASE STYLES & UI MENYERUPAI image_a359df.png */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            overflow: hidden;
+            width: 900px;
+            max-width: 95%;
+            margin: 40px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .left-panel {
+            flex: 1;
+            padding: 40px;
+            background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(135deg, rgba(26,35,126,0.8), rgba(13,71,161,0.8));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .left-panel h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .left-panel p {
+            font-size: 16px;
+            color: #bbdefb;
+            line-height: 1.5;
+        }
+
+        .right-panel {
+            flex: 1.5;
+            padding: 40px;
+            background: #111e52; /* Warna dominan form */
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #90caf9;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #e3f2fd;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #333;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group input[type="file"] {
+            background: #e3f2fd;
+            padding: 9px;
+            color: #111e52;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            background: linear-gradient(90deg, #2196f3, #2962ff);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-print {
+            background: transparent;
+            color: #90caf9;
+            border: 1px solid #90caf9;
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        /* CONFIGURASI CSS UNTUK FITUR PRINT (HARDCOPY) */
+        @media print {
+            body {
+                background: white !important; /* Memaksa bg jadi putih saat diprint agar tinta hemat */
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+                color: black !important;
+                display: block;
+            }
+            .container {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                width: 100%;
+                margin: 0;
+                background: white !important;
+            }
+            .left-panel {
+                display: none; /* Sembunyikan gambar UI sebelah kiri saat ngeprint */
+            }
+            .right-panel {
+                background: white !important;
+                padding: 20px;
+                width: 100%;
+            }
+            .form-header h2, .form-group label {
+                color: black !important;
+            }
+            .form-group input, .form-group select, .form-group textarea {
+                border: 1px solid #ccc;
+                background: #f9f9f9 !important;
+                color: black !important;
+            }
+            /* Sembunyikan tombol saat dicetak */
+            .btn-submit, .btn-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="printableArea">
+        <!-- Bagian Kiri (Desain) -->
+        <div class="left-panel">
+            <h1>Selamat Datang!</h1>
+            <p>Sistem Pendaftaran Anggota Baru<br><b>UKM NADIR (Nada dan Irama)</b></p>
+            <p style="margin-top:20px; font-size: 13px;">Silakan lengkapi formulir pendaftaran di samping dengan data yang sebenar-benarnya.</p>
+        </div>
+
+        <!-- Bagian Kanan (Formulir) -->
+        <div class="right-panel">
+            <div class="form-header">
+                <h2>Form Biodata Calon Anggota</h2>
+            </div>
+            
+            <form id="formPendaftaran">
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="nama" placeholder="Masukkan nama lengkap" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>NIM</label>
+                    <input type="text" id="nim" placeholder="Masukkan NIM Anda" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Program Studi (Prodi)</label>
+                    <input type="text" id="prodi" placeholder="Contoh: Teknik Informatika" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Tingkat / Semester</label>
+                    <select id="semester" required>
+                        <option value="" disabled selected>Pilih Semester</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Hobi (Terkait Nada & Irama)</label>
+                    <input type="text" id="hobi" placeholder="Contoh: Main Gitar, Menyanyi, dll" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Profile / CV / Pengalaman Organisasi</label>
+                    <textarea id="cv" rows="3" placeholder="Ceritakan singkat pengalaman Anda" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Prestasi (Opsional)</label>
+                    <textarea id="prestasi" rows="2" placeholder="Prestasi yang pernah diraih (jika ada)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>No HP / WA Aktif / Username IG</label>
+                    <input type="text" id="kontak" placeholder="Contoh: 0812xxxx / @username" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Bukti Follow Akun IG UKM NADIR (Format Gambar)</label>
+                    <input type="file" id="buktiFollow" accept="image/*" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Pasphoto Formal (Format Gambar)</label>
+                    <input type="file" id="pasphoto" accept="image/*" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
+                <button type="button" class="btn-print" onclick="window.print()">🖨️ Cetak Data (Hardcopy)</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
