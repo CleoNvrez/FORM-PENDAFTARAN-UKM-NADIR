@@ -248,5 +248,80 @@
         </div>
     </div>
 
+    <!-- SCRIPT INTEGRASI SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // 1. Inisialisasi Koneksi ke Supabase
+        const SUPABASE_URL = 'https://tbsajmwrxkawrjtkwrhf.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Z590SQhK6iazi3VMQOu2_g_DtDU9s03';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 2. Tangkap elemen form dan tombol submit
+        const form = document.getElementById('formPendaftaran');
+        const btnSubmit = document.querySelector('.btn-submit');
+
+        // 3. Buat aksi saat form disubmit
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Mencegah halaman reload
+
+            // Ubah tampilan tombol jadi loading
+            const originalBtnText = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = 'Memproses Data & Mengunggah Gambar... ⏳';
+            btnSubmit.disabled = true;
+
+            try {
+                // Ambil file gambar dari input
+                const fileBukti = document.getElementById('buktiFollow').files[0];
+                const fileFoto = document.getElementById('pasphoto').files[0];
+                const nimUser = document.getElementById('nim').value.replace(/\s+/g, ''); // Ambil NIM untuk penamaan file
+
+                // Buat penamaan file yang unik (NIM + Timestamp) agar tidak tertimpa
+                const timestamp = new Date().getTime();
+                const pathBukti = `bukti_${nimUser}_${timestamp}_${fileBukti.name}`;
+                const pathFoto = `pasphoto_${nimUser}_${timestamp}_${fileFoto.name}`;
+
+                // --- PROSES UPLOAD GAMBAR KE STORAGE 'berkas' ---
+                const { error: errBukti } = await supabase.storage.from('berkas').upload(pathBukti, fileBukti);
+                if (errBukti) throw new Error("Gagal mengunggah Bukti Follow: " + errBukti.message);
+
+                const { error: errFoto } = await supabase.storage.from('berkas').upload(pathFoto, fileFoto);
+                if (errFoto) throw new Error("Gagal mengunggah Pasphoto: " + errFoto.message);
+
+                // --- DAPATKAN LINK (URL) GAMBAR YANG SUDAH DIUPLOAD ---
+                const urlBukti = supabase.storage.from('berkas').getPublicUrl(pathBukti).data.publicUrl;
+                const urlFoto = supabase.storage.from('berkas').getPublicUrl(pathFoto).data.publicUrl;
+
+                // --- PROSES SIMPAN BIODATA & LINK GAMBAR KE TABEL 'pendaftaran' ---
+                const { error: errInsert } = await supabase.from('pendaftaran').insert([
+                    {
+                        nama: document.getElementById('nama').value,
+                        nim: document.getElementById('nim').value,
+                        prodi: document.getElementById('prodi').value,
+                        semester: document.getElementById('semester').value,
+                        hobi: document.getElementById('hobi').value,
+                        cv: document.getElementById('cv').value,
+                        prestasi: document.getElementById('prestasi').value,
+                        kontak: document.getElementById('kontak').value,
+                        buktiFollow: urlBukti,
+                        pasphoto: urlFoto
+                    }
+                ]);
+
+                if (errInsert) throw new Error("Gagal menyimpan data ke tabel: " + errInsert.message);
+
+                // Jika semua tahapan di atas berhasil
+                alert('Pendaftaran Berhasil! Data dan berkas Anda telah tersimpan ke sistem UKM NADIR.');
+                form.reset(); // Bersihkan isi form kembali seperti semula
+
+            } catch (error) {
+                console.error(error);
+                alert('Terjadi kesalahan:\n' + error.message);
+            } finally {
+                // Kembalikan tombol ke keadaan semula
+                btnSubmit.innerHTML = originalBtnText;
+                btnSubmit.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>
