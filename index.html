@@ -98,6 +98,20 @@
             cursor: pointer;
         }
 
+        /* Styling Pratinjau Gambar di Form & Print */
+        .preview-container {
+            margin-top: 8px;
+            display: none;
+        }
+
+        .preview-container img {
+            max-width: 120px;
+            max-height: 150px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            object-fit: cover;
+        }
+
         .btn-submit {
             background: linear-gradient(90deg, #2196f3, #2962ff);
             color: white;
@@ -132,7 +146,7 @@
         /* CONFIGURASI CSS UNTUK FITUR PRINT (HARDCOPY) */
         @media print {
             body {
-                background: white !important; /* Memaksa bg jadi putih saat diprint agar tinta hemat */
+                background: white !important; 
                 -webkit-print-color-adjust: exact; 
                 print-color-adjust: exact;
                 color: black !important;
@@ -146,7 +160,7 @@
                 background: white !important;
             }
             .left-panel {
-                display: none; /* Sembunyikan gambar UI sebelah kiri saat ngeprint */
+                display: none; /* Sembunyikan panel kiri saat dicetak */
             }
             .right-panel {
                 background: white !important;
@@ -157,12 +171,22 @@
                 color: black !important;
             }
             .form-group input, .form-group select, .form-group textarea {
-                border: 1px solid #ccc;
-                background: #f9f9f9 !important;
+                border: none;
+                border-bottom: 1px solid #000;
+                background: transparent !important;
                 color: black !important;
+                padding: 4px 0;
+            }
+            /* Tampilkan gambar saat dicetak */
+            .preview-container {
+                display: block !important;
+                margin-top: 5px;
+            }
+            .preview-container img {
+                border: 1px solid #000;
             }
             /* Sembunyikan tombol saat dicetak */
-            .btn-submit, .btn-print {
+            .btn-submit, .btn-print, input[type="file"] {
                 display: none !important;
             }
         }
@@ -235,11 +259,17 @@
                 <div class="form-group">
                     <label>Bukti Follow Akun IG UKM NADIR (Format Gambar)</label>
                     <input type="file" id="buktiFollow" accept="image/*" required>
+                    <div class="preview-container" id="previewBuktiContainer">
+                        <img id="previewBukti" src="" alt="Pratinjau Bukti Follow">
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Pasphoto Formal (Format Gambar)</label>
                     <input type="file" id="pasphoto" accept="image/*" required>
+                    <div class="preview-container" id="previewPasphotoContainer">
+                        <img id="previewPasphoto" src="" alt="Pratinjau Pasphoto">
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
@@ -248,52 +278,66 @@
         </div>
     </div>
 
-    <!-- SCRIPT INTEGRASI SUPABASE (DIPERBARUI) -->
+    <!-- SCRIPT INTEGRASI SUPABASE & PREVIEW GAMBAR -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
-        // 1. Inisialisasi Koneksi ke Supabase
         const SUPABASE_URL = 'https://tbsajmwrxkawrjtkwrhf.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_Z590SQhK6iazi3VMQOu2_g_DtDU9s03';
-        
-        // MENGUBAH NAMA VARIABEL MENJADI supabaseClient AGAR TIDAK BENTROK
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 2. Tangkap elemen form dan tombol submit
+        // Fungsi Pratinjau Gambar Otomatis saat File Dipilih
+        function setupImagePreview(inputId, imgId, containerId) {
+            const input = document.getElementById(inputId);
+            const img = document.getElementById(imgId);
+            const container = document.getElementById(containerId);
+
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        img.src = event.target.result;
+                        container.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    img.src = '';
+                    container.style.display = 'none';
+                }
+            });
+        }
+
+        setupImagePreview('buktiFollow', 'previewBukti', 'previewBuktiContainer');
+        setupImagePreview('pasphoto', 'previewPasphoto', 'previewPasphotoContainer');
+
         const form = document.getElementById('formPendaftaran');
         const btnSubmit = document.querySelector('.btn-submit');
 
-        // 3. Buat aksi saat form disubmit
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Mencegah halaman reload
+            e.preventDefault();
 
-            // Ubah tampilan tombol jadi loading
             const originalBtnText = btnSubmit.innerHTML;
             btnSubmit.innerHTML = 'Memproses Data & Mengunggah Gambar... ⏳';
             btnSubmit.disabled = true;
 
             try {
-                // Ambil file gambar dari input
                 const fileBukti = document.getElementById('buktiFollow').files[0];
                 const fileFoto = document.getElementById('pasphoto').files[0];
-                const nimUser = document.getElementById('nim').value.replace(/\s+/g, ''); // Ambil NIM untuk penamaan file
+                const nimUser = document.getElementById('nim').value.replace(/\s+/g, '');
 
-                // Buat penamaan file yang unik (NIM + Timestamp) agar tidak tertimpa
                 const timestamp = new Date().getTime();
                 const pathBukti = `bukti_${nimUser}_${timestamp}_${fileBukti.name}`;
                 const pathFoto = `pasphoto_${nimUser}_${timestamp}_${fileFoto.name}`;
 
-                // --- PROSES UPLOAD GAMBAR KE STORAGE 'berkas' ---
                 const { error: errBukti } = await supabaseClient.storage.from('berkas').upload(pathBukti, fileBukti);
                 if (errBukti) throw new Error("Gagal mengunggah Bukti Follow: " + errBukti.message);
 
                 const { error: errFoto } = await supabaseClient.storage.from('berkas').upload(pathFoto, fileFoto);
                 if (errFoto) throw new Error("Gagal mengunggah Pasphoto: " + errFoto.message);
 
-                // --- DAPATKAN LINK (URL) GAMBAR YANG SUDAH DIUPLOAD ---
                 const urlBukti = supabaseClient.storage.from('berkas').getPublicUrl(pathBukti).data.publicUrl;
                 const urlFoto = supabaseClient.storage.from('berkas').getPublicUrl(pathFoto).data.publicUrl;
 
-                // --- PROSES SIMPAN BIODATA & LINK GAMBAR KE TABEL 'pendaftaran' ---
                 const { error: errInsert } = await supabaseClient.from('pendaftaran').insert([
                     {
                         nama: document.getElementById('nama').value,
@@ -311,15 +355,15 @@
 
                 if (errInsert) throw new Error("Gagal menyimpan data ke tabel: " + errInsert.message);
 
-                // Jika semua tahapan di atas berhasil
                 alert('Pendaftaran Berhasil! Data dan berkas Anda telah tersimpan ke sistem UKM NADIR.');
-                form.reset(); // Bersihkan isi form kembali seperti semula
+                form.reset();
+                document.getElementById('previewBuktiContainer').style.display = 'none';
+                document.getElementById('previewPasphotoContainer').style.display = 'none';
 
             } catch (error) {
                 console.error(error);
                 alert('Terjadi kesalahan:\n' + error.message);
             } finally {
-                // Kembalikan tombol ke keadaan semula
                 btnSubmit.innerHTML = originalBtnText;
                 btnSubmit.disabled = false;
             }
