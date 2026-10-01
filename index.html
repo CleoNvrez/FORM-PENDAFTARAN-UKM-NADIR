@@ -143,6 +143,45 @@
             margin-top: 15px;
         }
 
+        /* Styling untuk Success Page (Halaman Gabung Grup WA) */
+        #successPage {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        #successPage h2 {
+            color: #4caf50;
+            margin-bottom: 15px;
+        }
+
+        #successPage p {
+            color: #e3f2fd;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .btn-wa {
+            display: block;
+            background: #25d366;
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+            text-align: center;
+        }
+
+        .btn-wa:hover {
+            background: #1ebe5d;
+            transform: translateY(-2px);
+        }
+
         /* CONFIGURASI CSS UNTUK FITUR PRINT (HARDCOPY) */
         @media print {
             body {
@@ -185,8 +224,8 @@
             .preview-container img {
                 border: 1px solid #000;
             }
-            /* Sembunyikan tombol saat dicetak */
-            .btn-submit, .btn-print, input[type="file"] {
+            /* Sembunyikan tombol & elemen sukses saat dicetak */
+            .btn-submit, .btn-print, input[type="file"], #successPage {
                 display: none !important;
             }
         }
@@ -202,12 +241,13 @@
             <p style="margin-top:20px; font-size: 13px;">Silakan lengkapi formulir pendaftaran di samping dengan data yang sebenar-benarnya.</p>
         </div>
 
-        <!-- Bagian Kanan (Formulir) -->
+        <!-- Bagian Kanan (Formulir & Success Page) -->
         <div class="right-panel">
             <div class="form-header">
                 <h2>Form Biodata Calon Anggota</h2>
             </div>
             
+            <!-- FORMULIR PENDAFTARAN -->
             <form id="formPendaftaran">
                 <div class="form-group">
                     <label>Nama Lengkap</label>
@@ -275,10 +315,22 @@
                 <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
                 <button type="button" class="btn-print" onclick="window.print()">🖨️ Cetak Data (Hardcopy)</button>
             </form>
+
+            <!-- HALAMAN SUKSES (MUNCUL SETELAH PENDAFTARAN BERHASIL) -->
+            <div id="successPage">
+                <h2>🎉 Pendaftaran Berhasil!</h2>
+                <p>Data diri dan berkas Anda telah tersimpan di sistem UKM NADIR. Silakan cetak bukti pendaftaran Anda untuk keperluan audit, dan bergabunglah ke grup WhatsApp resmi kami.</p>
+                
+                <a href="https://chat.whatsapp.com/HXspQqEncDUI5YWvBsQkjD" target="_blank" class="btn-wa">
+                    📱 Gabung ke Grup WhatsApp Calon Anggota
+                </a>
+
+                <button type="button" class="btn-print" onclick="window.print()">🖨️ Cetak Bukti Pendaftaran</button>
+            </div>
         </div>
     </div>
 
-    <!-- SCRIPT INTEGRASI SUPABASE & PREVIEW GAMBAR -->
+    <!-- SCRIPT INTEGRASI SUPABASE, PREVIEW, & SUCCESS PAGE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
         const SUPABASE_URL = 'https://tbsajmwrxkawrjtkwrhf.supabase.co';
@@ -311,6 +363,7 @@
         setupImagePreview('pasphoto', 'previewPasphoto', 'previewPasphotoContainer');
 
         const form = document.getElementById('formPendaftaran');
+        const successPage = document.getElementById('successPage');
         const btnSubmit = document.querySelector('.btn-submit');
 
         form.addEventListener('submit', async (e) => {
@@ -355,15 +408,13 @@
 
                 if (errInsert) throw new Error("Gagal menyimpan data ke tabel: " + errInsert.message);
 
-                alert('Pendaftaran Berhasil! Data dan berkas Anda telah tersimpan ke sistem UKM NADIR.');
-                form.reset();
-                document.getElementById('previewBuktiContainer').style.display = 'none';
-                document.getElementById('previewPasphotoContainer').style.display = 'none';
+                // Sembunyikan form dan tampilkan Success Page
+                form.style.display = 'none';
+                successPage.style.display = 'block';
 
             } catch (error) {
                 console.error(error);
                 alert('Terjadi kesalahan:\n' + error.message);
-            } finally {
                 btnSubmit.innerHTML = originalBtnText;
                 btnSubmit.disabled = false;
             }
