@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pendaftaran Anggota Baru UKM NADIR</title>
+    <title>Sistem Seleksi & Pendaftaran UKM NADIR</title>
     <style>
-        /* BASE STYLES & UI MENYERUPAI image_a359df.png */
+        /* BASE STYLES */
         body {
             margin: 0;
             padding: 0;
@@ -14,10 +14,43 @@
             color: #ffffff;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
         }
 
+        /* NAVIGATION TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            margin-bottom: -15px;
+            z-index: 10;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #bbdefb;
+            padding: 12px 25px;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active {
+            background: #111e52;
+            color: white;
+            border-bottom: none;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* CONTAINER UTAMA */
         .container {
             display: flex;
             background: rgba(255, 255, 255, 0.05);
@@ -27,10 +60,27 @@
             overflow: hidden;
             width: 900px;
             max-width: 95%;
-            margin: 40px 0;
+            margin-bottom: 40px;
             border: 1px solid rgba(255,255,255,0.1);
         }
 
+        /* TAB CONTENT WRAPPER */
+        .tab-content {
+            display: none;
+            width: 100%;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .tab-content.full-width {
+            flex-direction: column;
+            padding: 40px;
+            background: #111e52;
+        }
+
+        /* PANEL KIRI (Khusus Form Pendaftaran) */
         .left-panel {
             flex: 1;
             padding: 40px;
@@ -40,42 +90,35 @@
             justify-content: center;
         }
 
-        .left-panel h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
+        .left-panel h1 { font-size: 36px; margin-bottom: 10px; }
+        .left-panel p { font-size: 16px; color: #bbdefb; line-height: 1.5; }
 
-        .left-panel p {
-            font-size: 16px;
-            color: #bbdefb;
-            line-height: 1.5;
-        }
-
+        /* PANEL KANAN / FORM AREA */
         .right-panel {
             flex: 1.5;
             padding: 40px;
-            background: #111e52; /* Warna dominan form */
+            background: #111e52;
         }
 
-        .form-header {
-            margin-bottom: 30px;
-        }
+        .form-header { margin-bottom: 30px; }
+        .form-header h2 { margin: 0; font-size: 24px; color: #90caf9; }
+        .form-header p { color: #bbdefb; font-size: 14px; margin-top: 5px; }
 
-        .form-header h2 {
-            margin: 0;
-            font-size: 24px;
-            color: #90caf9;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
+        .form-group { margin-bottom: 15px; }
         .form-group label {
             display: block;
             margin-bottom: 5px;
             font-size: 13px;
             color: #e3f2fd;
+            font-weight: bold;
+        }
+        
+        /* Soal Psikotes Style */
+        .soal-text {
+            color: #90caf9;
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
         .form-group input, 
@@ -98,12 +141,7 @@
             cursor: pointer;
         }
 
-        /* Styling Pratinjau Gambar di Form & Print */
-        .preview-container {
-            margin-top: 8px;
-            display: none;
-        }
-
+        .preview-container { margin-top: 8px; display: none; }
         .preview-container img {
             max-width: 120px;
             max-height: 150px;
@@ -125,11 +163,7 @@
             margin-top: 20px;
             transition: 0.3s;
         }
-
-        .btn-submit:hover {
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
-            transform: translateY(-2px);
-        }
+        .btn-submit:hover { box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4); transform: translateY(-2px); }
 
         .btn-print {
             background: transparent;
@@ -143,205 +177,301 @@
             margin-top: 15px;
         }
 
-        /* Styling untuk Success Page (Halaman Gabung Grup WA) */
-        #successPage {
-            display: none;
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        #successPage h2 {
-            color: #4caf50;
-            margin-bottom: 15px;
-        }
-
-        #successPage p {
-            color: #e3f2fd;
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-
+        /* Success Page */
+        #successPage { display: none; text-align: center; padding: 20px 0; }
+        #successPage h2 { color: #4caf50; margin-bottom: 15px; }
+        #successPage p { color: #e3f2fd; font-size: 15px; line-height: 1.6; margin-bottom: 25px; }
         .btn-wa {
-            display: block;
-            background: #25d366;
-            color: white;
-            text-decoration: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            transition: 0.3s;
-            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
-            text-align: center;
+            display: block; background: #25d366; color: white; text-decoration: none;
+            padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold;
+            margin-bottom: 15px; transition: 0.3s; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+        }
+        .btn-wa:hover { background: #1ebe5d; transform: translateY(-2px); }
+
+        /* GRID UNTUK PENILAIAN WAWANCARA & BAKAT */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
 
-        .btn-wa:hover {
-            background: #1ebe5d;
-            transform: translateY(-2px);
-        }
-
-        /* CONFIGURASI CSS UNTUK FITUR PRINT (HARDCOPY) */
+        /* CONFIGURASI CSS UNTUK PRINT */
         @media print {
-            body {
-                background: white !important; 
-                -webkit-print-color-adjust: exact; 
-                print-color-adjust: exact;
-                color: black !important;
-                display: block;
-            }
-            .container {
-                box-shadow: none;
-                border: 1px solid #ccc;
-                width: 100%;
-                margin: 0;
-                background: white !important;
-            }
-            .left-panel {
-                display: none; /* Sembunyikan panel kiri saat dicetak */
-            }
-            .right-panel {
-                background: white !important;
-                padding: 20px;
-                width: 100%;
-            }
-            .form-header h2, .form-group label {
-                color: black !important;
-            }
+            body { background: white !important; color: black !important; display: block; }
+            .tabs { display: none !important; } /* Sembunyikan tombol navigasi saat diprint */
+            .container { box-shadow: none; border: none; width: 100%; margin: 0; background: white !important; }
+            .left-panel { display: none; }
+            .right-panel, .tab-content.full-width { background: white !important; padding: 0; width: 100%; }
+            
+            .form-header h2, .form-group label, .soal-text, .form-header p { color: black !important; }
+            
             .form-group input, .form-group select, .form-group textarea {
-                border: none;
-                border-bottom: 1px solid #000;
-                background: transparent !important;
-                color: black !important;
-                padding: 4px 0;
+                border: none; border-bottom: 1px dashed #000; background: transparent !important; color: black !important; padding: 4px 0; border-radius: 0;
             }
-            /* Tampilkan gambar saat dicetak */
-            .preview-container {
-                display: block !important;
-                margin-top: 5px;
-            }
-            .preview-container img {
-                border: 1px solid #000;
-            }
-            /* Sembunyikan tombol & elemen sukses saat dicetak */
-            .btn-submit, .btn-print, input[type="file"], #successPage {
-                display: none !important;
-            }
+            textarea { resize: none; border: 1px solid #000 !important; height: auto !important; }
+            
+            .preview-container { display: block !important; margin-top: 5px; }
+            .preview-container img { border: 1px solid #000; }
+            .btn-submit, .btn-print, input[type="file"], #successPage { display: none !important; }
+            
+            /* Sembunyikan tab yang tidak aktif saat ngeprint */
+            .tab-content { display: none !important; }
+            .tab-content.active { display: flex !important; display: block !important; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container" id="printableArea">
-        <!-- Bagian Kiri (Desain) -->
-        <div class="left-panel">
-            <h1>Selamat Datang!</h1>
-            <p>Sistem Pendaftaran Anggota Baru<br><b>UKM NADIR (Nada dan Irama)</b></p>
-            <p style="margin-top:20px; font-size: 13px;">Silakan lengkapi formulir pendaftaran di samping dengan data yang sebenar-benarnya.</p>
-        </div>
-
-        <!-- Bagian Kanan (Formulir & Success Page) -->
-        <div class="right-panel">
-            <div class="form-header">
-                <h2>Form Biodata Calon Anggota</h2>
-            </div>
-            
-            <!-- FORMULIR PENDAFTARAN -->
-            <form id="formPendaftaran">
-                <div class="form-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" id="nama" placeholder="Masukkan nama lengkap" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>NIM</label>
-                    <input type="text" id="nim" placeholder="Masukkan NIM Anda" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Program Studi (Prodi)</label>
-                    <input type="text" id="prodi" placeholder="Contoh: Teknik Informatika" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Tingkat / Semester</label>
-                    <select id="semester" required>
-                        <option value="" disabled selected>Pilih Semester</option>
-                        <option value="1">Semester 1</option>
-                        <option value="2">Semester 2</option>
-                        <option value="3">Semester 3</option>
-                        <option value="4">Semester 4</option>
-                        <option value="5">Semester 5</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Hobi (Terkait Nada & Irama)</label>
-                    <input type="text" id="hobi" placeholder="Contoh: Main Gitar, Menyanyi, dll" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Profile / CV / Pengalaman Organisasi</label>
-                    <textarea id="cv" rows="3" placeholder="Ceritakan singkat pengalaman Anda" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Prestasi (Opsional)</label>
-                    <textarea id="prestasi" rows="2" placeholder="Prestasi yang pernah diraih (jika ada)"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>No HP / WA Aktif / Username IG</label>
-                    <input type="text" id="kontak" placeholder="Contoh: 0812xxxx / @username" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Bukti Follow Akun IG UKM NADIR (Format Gambar)</label>
-                    <input type="file" id="buktiFollow" accept="image/*" required>
-                    <div class="preview-container" id="previewBuktiContainer">
-                        <img id="previewBukti" src="" alt="Pratinjau Bukti Follow">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Pasphoto Formal (Format Gambar)</label>
-                    <input type="file" id="pasphoto" accept="image/*" required>
-                    <div class="preview-container" id="previewPasphotoContainer">
-                        <img id="previewPasphoto" src="" alt="Pratinjau Pasphoto">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
-                <button type="button" class="btn-print" onclick="window.print()">🖨️ Cetak Data (Hardcopy)</button>
-            </form>
-
-            <!-- HALAMAN SUKSES (MUNCUL SETELAH PENDAFTARAN BERHASIL) -->
-            <div id="successPage">
-                <h2>🎉 Pendaftaran Berhasil!</h2>
-                <p>Data diri dan berkas Anda telah tersimpan di sistem UKM NADIR. Silakan cetak bukti pendaftaran Anda untuk keperluan audit, dan bergabunglah ke grup WhatsApp resmi kami.</p>
-                
-                <a href="https://chat.whatsapp.com/HXspQqEncDUI5YWvBsQkjD" target="_blank" class="btn-wa">
-                    📱 Gabung ke Grup WhatsApp Calon Anggota
-                </a>
-
-                <button type="button" class="btn-print" onclick="window.print()">🖨️ Cetak Bukti Pendaftaran</button>
-            </div>
-        </div>
+    <!-- NAVIGASI TAB -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('tab-pendaftaran', this)">Pendaftaran</button>
+        <button class="tab-btn" onclick="openTab('tab-psikotes', this)">Psikotes</button>
+        <button class="tab-btn" onclick="openTab('tab-wawancara', this)">Nilai Wawancara</button>
+        <button class="tab-btn" onclick="openTab('tab-bakat', this)">Nilai Tes Bakat</button>
     </div>
 
-    <!-- SCRIPT INTEGRASI SUPABASE, PREVIEW, & SUCCESS PAGE -->
+    <div class="container" id="printableArea">
+        
+        <!-- ================= TAB 1: PENDAFTARAN (ORIGINAL) ================= -->
+        <div id="tab-pendaftaran" class="tab-content active">
+            <div class="left-panel">
+                <h1>Selamat Datang!</h1>
+                <p>Sistem Pendaftaran Anggota Baru<br><b>UKM NADIR (Nada dan Irama)</b></p>
+                <p style="margin-top:20px; font-size: 13px;">Silakan lengkapi formulir pendaftaran di samping dengan data yang sebenar-benarnya.</p>
+            </div>
+            <div class="right-panel">
+                <div class="form-header">
+                    <h2>Form Biodata Calon Anggota</h2>
+                </div>
+                <form id="formPendaftaran">
+                    <div class="form-group"><label>Nama Lengkap</label><input type="text" id="nama" placeholder="Masukkan nama lengkap" required></div>
+                    <div class="form-group"><label>NIM</label><input type="text" id="nim" placeholder="Masukkan NIM Anda" required></div>
+                    <div class="form-group"><label>Program Studi (Prodi)</label><input type="text" id="prodi" placeholder="Contoh: Teknik Informatika" required></div>
+                    <div class="form-group">
+                        <label>Tingkat / Semester</label>
+                        <select id="semester" required>
+                            <option value="" disabled selected>Pilih Semester</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Hobi (Terkait Nada & Irama)</label><input type="text" id="hobi" required></div>
+                    <div class="form-group"><label>Profile / CV / Pengalaman Organisasi</label><textarea id="cv" rows="3" required></textarea></div>
+                    <div class="form-group"><label>Prestasi (Opsional)</label><textarea id="prestasi" rows="2"></textarea></div>
+                    <div class="form-group"><label>No HP / WA Aktif / Username IG</label><input type="text" id="kontak" required></div>
+                    <div class="form-group">
+                        <label>Bukti Follow Akun IG UKM NADIR</label>
+                        <input type="file" id="buktiFollow" accept="image/*" required>
+                        <div class="preview-container" id="previewBuktiContainer"><img id="previewBukti" src=""></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Pasphoto Formal</label>
+                        <input type="file" id="pasphoto" accept="image/*" required>
+                        <div class="preview-container" id="previewPasphotoContainer"><img id="previewPasphoto" src=""></div>
+                    </div>
+                    <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
+                    <button type="button" class="btn-print" onclick="window.print()">🖨️ Cetak Data (Hardcopy)</button>
+                </form>
+
+                <div id="successPage">
+                    <h2>🎉 Pendaftaran Berhasil!</h2>
+                    <p>Data diri dan berkas Anda telah tersimpan. Silakan cetak bukti pendaftaran dan bergabunglah ke grup WhatsApp resmi kami.</p>
+                    <a href="https://chat.whatsapp.com/HXspQqEncDUI5YWvBsQkjD" target="_blank" class="btn-wa">📱 Gabung ke Grup WhatsApp</a>
+                    <button type="button" class="btn-print" onclick="window.print()">🖨️ Cetak Bukti Pendaftaran</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 2: PSIKOTES ================= -->
+        <div id="tab-psikotes" class="tab-content full-width">
+            <div class="form-header">
+                <h2>Lembar Psikotes Calon Anggota</h2>
+                <p>Diisi secara mandiri oleh calon anggota UKM NADIR.</p>
+            </div>
+            <form>
+                <div class="grid-2">
+                    <div class="form-group"><label>Nama Lengkap</label><input type="text"></div>
+                    <div class="form-group"><label>NIM</label><input type="text"></div>
+                </div>
+                <div class="form-group"><label>Program Studi</label><input type="text"></div>
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+                
+                <div class="form-group">
+                    <div class="soal-text">1. Kerjasama Tim: Saat latihan rutin menjelang pentas, ada anggota yang sering datang terlambat dan menghambat latihan. Apa tindakan Anda?</div>
+                    <textarea rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <div class="soal-text">2. Manajemen Stres: Saat terjadi kendala teknis (misal: sound mati atau alat rusak) di tengah pertunjukan live, bagaimana reaksi spontan dan solusi Anda?</div>
+                    <textarea rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <div class="soal-text">3. Keterbukaan: Jika ide konsep/aransemen yang Anda buat dengan susah payah ternyata ditolak oleh mayoritas anggota grup, sikap Anda adalah...</div>
+                    <textarea rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <div class="soal-text">4. Manajemen Waktu: Bagaimana prioritas Anda jika jadwal gladi bersih UKM bentrok dengan tugas kuliah yang mendadak harus dikumpulkan besok pagi?</div>
+                    <textarea rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <div class="soal-text">5. Motivasi: Apa dorongan utama Anda saat tampil atau berkarya di bidang nada dan irama di depan banyak orang?</div>
+                    <textarea rows="3"></textarea>
+                </div>
+                <button type="button" class="btn-print" onclick="window.print()" style="margin-top: 30px;">🖨️ Cetak Lembar Psikotes</button>
+            </form>
+        </div>
+
+        <!-- ================= TAB 3: PENILAIAN WAWANCARA ================= -->
+        <div id="tab-wawancara" class="tab-content full-width">
+            <div class="form-header">
+                <h2>Form Penilaian Tes Wawancara</h2>
+                <p>Diisi oleh Panitia / Penguji UKM NADIR.</p>
+            </div>
+            <form>
+                <div class="grid-2">
+                    <div class="form-group"><label>Nama Peserta</label><input type="text"></div>
+                    <div class="form-group"><label>NIM</label><input type="text"></div>
+                </div>
+                <div class="form-group"><label>Program Studi</label><input type="text"></div>
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Artikulasi (Skor 1-100)</label>
+                        <input type="number" placeholder="Nilai">
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Artikulasi</label>
+                        <input type="text" placeholder="Keterangan...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Wawasan (Skor 1-100)</label>
+                        <input type="number" placeholder="Nilai">
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Wawasan</label>
+                        <input type="text" placeholder="Keterangan...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pengalaman (Skor 1-100)</label>
+                        <input type="number" placeholder="Nilai">
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Pengalaman</label>
+                        <input type="text" placeholder="Keterangan...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Penyampaian (Skor 1-100)</label>
+                        <input type="number" placeholder="Nilai">
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Penyampaian</label>
+                        <input type="text" placeholder="Keterangan...">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Kesimpulan Wawancara</label>
+                    <textarea rows="3" placeholder="Tuliskan kesimpulan akhir penguji..."></textarea>
+                </div>
+                <button type="button" class="btn-print" onclick="window.print()" style="margin-top: 20px;">🖨️ Cetak Nilai Wawancara</button>
+            </form>
+        </div>
+
+        <!-- ================= TAB 4: PENILAIAN TES BAKAT ================= -->
+        <div id="tab-bakat" class="tab-content full-width">
+            <div class="form-header">
+                <h2>Form Penilaian Tes Bakat</h2>
+                <p>Diisi oleh Panitia / Penguji UKM NADIR.</p>
+            </div>
+            <form>
+                <div class="grid-2">
+                    <div class="form-group"><label>Nama Peserta</label><input type="text"></div>
+                    <div class="form-group"><label>NIM</label><input type="text"></div>
+                </div>
+                <div class="form-group"><label>Program Studi</label><input type="text"></div>
+                <div class="form-group"><label>Bakat yang Ditampilkan (Cth: Vokal, Gitar, dll)</label><input type="text"></div>
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Kreativitas (Skor 1-100)</label>
+                        <input type="number" placeholder="Nilai">
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Kreativitas</label>
+                        <input type="text" placeholder="Keterangan...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Improvisasi (Skor 1-100)</label>
+                        <input type="number" placeholder="Nilai">
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Improvisasi</label>
+                        <input type="text" placeholder="Keterangan...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Percaya Diri (Skor 1-100)</label>
+                        <input type="number" placeholder="Nilai">
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Percaya Diri</label>
+                        <input type="text" placeholder="Keterangan...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Penampilan (Skor 1-100)</label>
+                        <input type="number" placeholder="Nilai">
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Penampilan</label>
+                        <input type="text" placeholder="Keterangan...">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Kesimpulan Tes Bakat</label>
+                    <textarea rows="3" placeholder="Tuliskan kesimpulan akhir penguji..."></textarea>
+                </div>
+                <button type="button" class="btn-print" onclick="window.print()" style="margin-top: 20px;">🖨️ Cetak Nilai Tes Bakat</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT LOGIKA TAB & SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
+        // FUNGSI UNTUK PINDAH TAB
+        function openTab(tabId, element) {
+            // Sembunyikan semua tab content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Hapus class active dari semua tombol
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Tampilkan tab yang dipilih
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+
+        // ================= KODE SUPABASE (Hanya berjalan di Tab 1) =================
         const SUPABASE_URL = 'https://tbsajmwrxkawrjtkwrhf.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_Z590SQhK6iazi3VMQOu2_g_DtDU9s03';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Fungsi Pratinjau Gambar Otomatis saat File Dipilih
         function setupImagePreview(inputId, imgId, containerId) {
             const input = document.getElementById(inputId);
             const img = document.getElementById(imgId);
             const container = document.getElementById(containerId);
+            if(!input) return; // Mencegah error jika input tidak ada di tab lain
 
             input.addEventListener('change', (e) => {
                 const file = e.target.files[0];
@@ -366,59 +496,60 @@
         const successPage = document.getElementById('successPage');
         const btnSubmit = document.querySelector('.btn-submit');
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        if(form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-            const originalBtnText = btnSubmit.innerHTML;
-            btnSubmit.innerHTML = 'Memproses Data & Mengunggah Gambar... ⏳';
-            btnSubmit.disabled = true;
+                const originalBtnText = btnSubmit.innerHTML;
+                btnSubmit.innerHTML = 'Memproses Data & Mengunggah Gambar... ⏳';
+                btnSubmit.disabled = true;
 
-            try {
-                const fileBukti = document.getElementById('buktiFollow').files[0];
-                const fileFoto = document.getElementById('pasphoto').files[0];
-                const nimUser = document.getElementById('nim').value.replace(/\s+/g, '');
+                try {
+                    const fileBukti = document.getElementById('buktiFollow').files[0];
+                    const fileFoto = document.getElementById('pasphoto').files[0];
+                    const nimUser = document.getElementById('nim').value.replace(/\s+/g, '');
 
-                const timestamp = new Date().getTime();
-                const pathBukti = `bukti_${nimUser}_${timestamp}_${fileBukti.name}`;
-                const pathFoto = `pasphoto_${nimUser}_${timestamp}_${fileFoto.name}`;
+                    const timestamp = new Date().getTime();
+                    const pathBukti = `bukti_${nimUser}_${timestamp}_${fileBukti.name}`;
+                    const pathFoto = `pasphoto_${nimUser}_${timestamp}_${fileFoto.name}`;
 
-                const { error: errBukti } = await supabaseClient.storage.from('berkas').upload(pathBukti, fileBukti);
-                if (errBukti) throw new Error("Gagal mengunggah Bukti Follow: " + errBukti.message);
+                    const { error: errBukti } = await supabaseClient.storage.from('berkas').upload(pathBukti, fileBukti);
+                    if (errBukti) throw new Error("Gagal mengunggah Bukti Follow: " + errBukti.message);
 
-                const { error: errFoto } = await supabaseClient.storage.from('berkas').upload(pathFoto, fileFoto);
-                if (errFoto) throw new Error("Gagal mengunggah Pasphoto: " + errFoto.message);
+                    const { error: errFoto } = await supabaseClient.storage.from('berkas').upload(pathFoto, fileFoto);
+                    if (errFoto) throw new Error("Gagal mengunggah Pasphoto: " + errFoto.message);
 
-                const urlBukti = supabaseClient.storage.from('berkas').getPublicUrl(pathBukti).data.publicUrl;
-                const urlFoto = supabaseClient.storage.from('berkas').getPublicUrl(pathFoto).data.publicUrl;
+                    const urlBukti = supabaseClient.storage.from('berkas').getPublicUrl(pathBukti).data.publicUrl;
+                    const urlFoto = supabaseClient.storage.from('berkas').getPublicUrl(pathFoto).data.publicUrl;
 
-                const { error: errInsert } = await supabaseClient.from('pendaftaran').insert([
-                    {
-                        nama: document.getElementById('nama').value,
-                        nim: document.getElementById('nim').value,
-                        prodi: document.getElementById('prodi').value,
-                        semester: document.getElementById('semester').value,
-                        hobi: document.getElementById('hobi').value,
-                        cv: document.getElementById('cv').value,
-                        prestasi: document.getElementById('prestasi').value,
-                        kontak: document.getElementById('kontak').value,
-                        buktiFollow: urlBukti,
-                        pasphoto: urlFoto
-                    }
-                ]);
+                    const { error: errInsert } = await supabaseClient.from('pendaftaran').insert([
+                        {
+                            nama: document.getElementById('nama').value,
+                            nim: document.getElementById('nim').value,
+                            prodi: document.getElementById('prodi').value,
+                            semester: document.getElementById('semester').value,
+                            hobi: document.getElementById('hobi').value,
+                            cv: document.getElementById('cv').value,
+                            prestasi: document.getElementById('prestasi').value,
+                            kontak: document.getElementById('kontak').value,
+                            buktiFollow: urlBukti,
+                            pasphoto: urlFoto
+                        }
+                    ]);
 
-                if (errInsert) throw new Error("Gagal menyimpan data ke tabel: " + errInsert.message);
+                    if (errInsert) throw new Error("Gagal menyimpan data ke tabel: " + errInsert.message);
 
-                // Sembunyikan form dan tampilkan Success Page
-                form.style.display = 'none';
-                successPage.style.display = 'block';
+                    form.style.display = 'none';
+                    successPage.style.display = 'block';
 
-            } catch (error) {
-                console.error(error);
-                alert('Terjadi kesalahan:\n' + error.message);
-                btnSubmit.innerHTML = originalBtnText;
-                btnSubmit.disabled = false;
-            }
-        });
+                } catch (error) {
+                    console.error(error);
+                    alert('Terjadi kesalahan:\n' + error.message);
+                    btnSubmit.innerHTML = originalBtnText;
+                    btnSubmit.disabled = false;
+                }
+            });
+        }
     </script>
 </body>
 </html>
